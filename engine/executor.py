@@ -5,6 +5,44 @@ from typing import Dict, Any, List, Tuple
 from .types import Plan, PlannedOp
 from .journal import new_run_id, write_journal, read_journal, latest_run_id, delete_journal
 
+def _is_within_root(path: str, root: str) -> bool:
+    path = os.path.abspath(path)
+    root = os.path.abspath(root)
+    try:
+        common = os.path.commonpath([path, root])
+    except ValueError:
+        return False
+    return common == root
+
+
+def _ensure_parent_and_track(dst: str, root: str, created_dirs: set[str]) -> None:
+    """
+    Create parent directories for dst and record any NEW dirs created (within root).
+    """
+    parent = os.path.abspath(os.path.dirname(dst))
+    root = os.path.abspath(root)
+
+    if not _is_within_root(parent, root):
+        # Safety guard: we never create folders outside root
+        return
+
+    # Build list of parents from root -> leaf to detect which were missing
+    to_create = []
+    cur = parent
+    while _is_within_root(cur, root) and cur != root:
+        if os.path.exists(cur):
+            break
+        to_create.append(cur)
+        cur = os.path.dirname(cur)
+
+    # Create from top to bottom
+    for d in reversed(to_create):
+        os.makedirs(d, exist_ok=True)
+        created_dirs.add(d)
+
+    # Ensure parent exists (in case it partially existed)
+    os.makedirs(parent, exist_ok=True)
+
 
 def _ensure_parent(path: str) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -48,6 +86,7 @@ def apply_plan(
     run_id = new_run_id()
 
     executed: List[Dict[str, Any]] = []
+    created_dirs: set[str] = set()
     skipped: List[Dict[str, Any]] = []
     errors: List[Dict[str, Any]] = []
 
@@ -70,7 +109,7 @@ def apply_plan(
             continue
 
         try:
-            _ensure_parent(final_dst)
+            _ensure_parent_and_track(final_dst, plan.root, created_dirs)
             # overwrite means remove target first
             if conflict_strategy == "overwrite" and os.path.exists(final_dst):
                 os.remove(final_dst)
@@ -88,6 +127,7 @@ def apply_plan(
         "executed": executed,
         "skipped": skipped,
         "errors": errors,
+        "created_dirs": sorted(created_dirs),
     }
     write_journal(journal_dir, run_id, payload)
 
@@ -143,9 +183,41 @@ def undo_run(journal_dir: str, run_id: str) -> Dict[str, Any]:
     if not errors:
         delete_journal(journal_dir, run_id)
 
+        # Cleanup empty directories that were created during apply
+    created_dirs = data.get("created_dirs", [])
+    root = os.path.abspath(data.get("root", ""))
+
+    # Delete deepest paths first (so child folders removed before parents)
+    created_dirs = sorted(
+        (os.path.abspath(d) for d in created_dirs),
+        key=lambda p: p.count(os.sep),
+        reverse=True
+    )
+
+    dir_deleted = 0
+    dir_errors = []
+
+    for d in created_dirs:
+        try:
+            if not d or not os.path.isdir(d):
+                continue
+            if not _is_within_root(d, root):
+                continue
+            # Only remove if empty
+            if not os.listdir(d):
+                os.rmdir(d)
+                dir_deleted += 1
+        except Exception as e:
+            dir_errors.append({"dir": d, "error": str(e)})
+
+    if dir_errors:
+        # don't fail the whole undo; just report
+        errors.extend(dir_errors)
+
     return {
         "ok": len(errors) == 0,
         "run_id": run_id,
         "undone": undone,
+        "dirs_deleted": dir_deleted,
         "errors": errors,
     }

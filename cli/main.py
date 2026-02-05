@@ -39,7 +39,8 @@ def cmd_scan(args: argparse.Namespace) -> int:
 def cmd_plan(args: argparse.Namespace) -> int:
     files = scan_folder(args.root)
     rules = load_rules_yaml(args.rules)
-    plan = build_plan(args.root, files, rules, quarantine_dirname=args.quarantine)
+    # plan = build_plan(args.root, files, rules, quarantine_dirname=args.quarantine)
+    plan = build_plan(args.root, files, rules)
 
     payload = {
         "root": plan.root,

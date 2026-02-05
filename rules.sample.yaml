@@ -1,28 +1,160 @@
 rules:
+  # -------------------------
+  # Screenshots / Images
+  # -------------------------
   - name: screenshots_by_month
     match:
-      extension: [".png", ".jpg", ".jpeg"]
-      filename_contains: ["screenshot", "截屏", "screen shot"]
+      extension: [".png", ".jpg", ".jpeg", ".webp"]
+      filename_contains: ["screenshot", "screen shot", "截屏", "截图"]
     action:
       move_to: "Screenshots/{year}/{month}"
 
-  - name: installers
+  - name: images_general
     match:
-      extension: [".exe", ".msi", ".dmg", ".pkg"]
+      extension: [".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tiff", ".heic"]
       filename_contains: []
     action:
-      move_to: "Installers"
+      move_to: "Images/{year}/{month}"
 
-  - name: documents_pdf
+  # -------------------------
+  # Documents
+  # -------------------------
+  - name: pdfs
     match:
       extension: [".pdf"]
       filename_contains: []
     action:
-      move_to: "Documents/PDF"
+      move_to: "Documents/PDF/{year}"
 
-  - name: archives
+  - name: office_docs
     match:
-      extension: [".zip", ".rar", ".7z", ".tar", ".gz"]
+      extension: [".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx"]
       filename_contains: []
     action:
-      move_to: "Archives"
+      move_to: "Documents/Office/{year}"
+
+  - name: text_docs
+    match:
+      extension: [".txt", ".md", ".rtf"]
+      filename_contains: []
+    action:
+      move_to: "Documents/Text"
+
+  - name: ebooks
+    match:
+      extension: [".epub", ".mobi", ".azw", ".azw3"]
+      filename_contains: []
+    action:
+      move_to: "Documents/eBooks"
+
+  # -------------------------
+  # Data files
+  # -------------------------
+  - name: data_files
+    match:
+      extension: [".csv", ".tsv", ".json", ".xml", ".yaml", ".yml"]
+      filename_contains: []
+    action:
+      move_to: "Data/{year}"
+
+  # -------------------------
+  # Code / Dev
+  # -------------------------
+  - name: code_scripts
+    match:
+      extension: [".py", ".js", ".ts", ".java", ".cpp", ".c", ".h", ".hpp", ".cs", ".go", ".rs", ".sh", ".bat", ".ps1"]
+      filename_contains: []
+    action:
+      move_to: "Code/Scripts"
+
+  - name: notebooks
+    match:
+      extension: [".ipynb"]
+      filename_contains: []
+    action:
+      move_to: "Code/Notebooks"
+
+  # -------------------------
+  # Installers
+  # -------------------------
+  - name: installers_windows
+    match:
+      extension: [".exe", ".msi"]
+      filename_contains: ["setup", "installer"]
+    action:
+      move_to: "Installers/Windows"
+
+  - name: installers_macos
+    match:
+      extension: [".dmg", ".pkg"]
+      filename_contains: []
+    action:
+      move_to: "Installers/macOS"
+
+  - name: installers_mobile
+    match:
+      extension: [".apk", ".aab"]
+      filename_contains: []
+    action:
+      move_to: "Installers/Mobile"
+
+  # -------------------------
+  # Archives
+  # -------------------------
+  - name: archives
+    match:
+      extension: [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz"]
+      filename_contains: []
+    action:
+      move_to: "Archives/{year}"
+
+  # -------------------------
+  # Media
+  # -------------------------
+  - name: videos
+    match:
+      extension: [".mp4", ".mov", ".mkv", ".avi", ".wmv", ".webm"]
+      filename_contains: []
+    action:
+      move_to: "Media/Videos/{year}"
+
+  - name: audio
+    match:
+      extension: [".mp3", ".wav", ".m4a", ".aac", ".flac", ".ogg"]
+      filename_contains: []
+    action:
+      move_to: "Media/Audio/{year}"
+
+  # -------------------------
+  # Design / Fonts
+  # -------------------------
+  - name: design_assets
+    match:
+      extension: [".psd", ".ai", ".fig", ".sketch", ".xd"]
+      filename_contains: []
+    action:
+      move_to: "Design/Source"
+
+  - name: fonts
+    match:
+      extension: [".ttf", ".otf", ".woff", ".woff2"]
+      filename_contains: []
+    action:
+      move_to: "Design/Fonts"
+
+  # -------------------------
+  # Temp / junk (可选：你不想自动丢垃圾就删掉这几条)
+  # -------------------------
+  - name: temp_files
+    match:
+      extension: [".tmp", ".temp", ".log"]
+      filename_contains: []
+    action:
+      move_to: "Trash/Temp"
+
+  - name: partial_downloads
+    match:
+      extension: [".crdownload", ".part"]
+      filename_contains: []
+    action:
+      move_to: "Trash/Downloads"

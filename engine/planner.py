@@ -42,7 +42,7 @@ def build_plan(
     root: str,
     files: List[FileMeta],
     rules: List[Rule],
-    quarantine_dirname: str = "Quarantine",
+    # quarantine_dirname: str = "Quarantine",
 ) -> Plan:
     root = os.path.abspath(root)
     ops: List[PlannedOp] = []
@@ -61,18 +61,18 @@ def build_plan(
 
         if best_rule is None:
             # unmatched → quarantine (low confidence)
-            dest_dir = os.path.join(root, quarantine_dirname)
-            dst = os.path.join(dest_dir, f.name)
-            ops.append(
-                PlannedOp(
-                    op="move",
-                    src=f.path,
-                    dst=dst,
-                    reason="Unmatched by rules → quarantine",
-                    confidence=0.2,
-                    rule_name=None,
-                )
-            )
+            # dest_dir = os.path.join(root, quarantine_dirname)
+            # dst = os.path.join(dest_dir, f.name)
+            # ops.append(
+            #     PlannedOp(
+            #         op="move",
+            #         src=f.path,
+            #         dst=dst,
+            #         reason="Unmatched by rules → quarantine",
+            #         confidence=0.2,
+            #         rule_name=None,
+            #     )
+            # )
             continue
 
         rel_dest_dir = _format_dest(best_rule.action.move_to, f.mtime)
