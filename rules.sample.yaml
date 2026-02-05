@@ -1,0 +1,28 @@
+rules:
+  - name: screenshots_by_month
+    match:
+      extension: [".png", ".jpg", ".jpeg"]
+      filename_contains: ["screenshot", "截屏", "screen shot"]
+    action:
+      move_to: "Screenshots/{year}/{month}"
+
+  - name: installers
+    match:
+      extension: [".exe", ".msi", ".dmg", ".pkg"]
+      filename_contains: []
+    action:
+      move_to: "Installers"
+
+  - name: documents_pdf
+    match:
+      extension: [".pdf"]
+      filename_contains: []
+    action:
+      move_to: "Documents/PDF"
+
+  - name: archives
+    match:
+      extension: [".zip", ".rar", ".7z", ".tar", ".gz"]
+      filename_contains: []
+    action:
+      move_to: "Archives"
