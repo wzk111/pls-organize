@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "root": { "type": "string" },
+    "created_at": { "type": "string" },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "op": { "type": "string", "enum": ["move"] },
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "reason": { "type": "string" },
+          "confidence": { "type": "number" }
+        },
+        "required": ["op", "from", "to", "reason", "confidence"]
+      }
+    }
+  },
+  "required": ["root", "created_at", "operations"]
+}
