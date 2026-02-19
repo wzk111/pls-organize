@@ -28,51 +28,46 @@ python -m gui.app
 
 ## App UI Walkthrough
 
-pls-organize follows a simple, explicit 3-step workflow to ensure safety and clarity.
+Below is the main GUI. The numbered boxes match the explanation list right after it.
 
-### 1. Select Folder & Rules
-At the top of the UI, choose the target folder to organize and the rules file (`rules.yaml`).
+![pls-organize GUI walkthrough](docs/ui-walkthrough.png)
 
-Optionally, you can describe your intent using natural language (e.g. *“Sort screenshots by month and put PDFs into Documents”*).
-Click **Generate rules** to let the AI draft a rules file — no files are moved at this stage.
+### Key controls (numbers match the screenshot)
 
----
+1. **Browse**  
+   Pick the target folder you want to organize. This only updates the path field — no files are changed.
 
-### 2. Scan
-Click **Scan** to analyze the folder.
-This step only collects metadata (file names, extensions, timestamps) and does not modify anything.
+2. **Load rules**  
+   Load an existing YAML rules file (e.g., `rules.yaml`). The rules define how files will be categorized and moved.
 
----
+3. **Generate rules**  
+   Use your natural-language intent (the text box on the left) to let the AI draft a rules file.  
+   **No files are moved** at this stage — it only generates/updates rules for your review.
 
-### 3. Plan (Preview)
-Click **Plan (Preview)** to generate a deterministic move plan based on the rules.
+4. **Scan**  
+   Analyze the selected folder and collect metadata (names, extensions, timestamps, sizes, etc.).  
+   This step is **read-only** and does not modify any files.
 
-The preview table shows:
-- **From**: current file location
-- **To**: proposed destination
-- **Confidence**: how certain the rule match is
-- **Reason**: which rule caused the action
+5. **Plan (Preview)**  
+   Generate a deterministic move plan based on the loaded/generated rules.  
+   The table preview shows exactly what will happen before execution:
+   - **From**: current file path
+   - **To**: proposed destination
+   - **Conf**: confidence score for the rule match
+   - **Reason**: which rule triggered the move
 
-You can filter the preview using:
-- Minimum confidence threshold
-- Search
-- Low-confidence toggle
+6. **Apply**  
+   Execute the currently previewed plan (only what you can see/filter in the table).  
+   Every operation is recorded to a **journal** so you can safely rollback.
 
-This makes every action explainable and reviewable before execution.
-
----
-
-### 4. Apply
-Click **Apply** to execute the plan.
-Only the currently previewed operations are applied.
-
-All operations are written to a journal, enabling safe rollback.
+7. **Undo last**  
+   Revert the most recent Apply:
+   - Moves files back to original locations
+   - Removes empty folders created during Apply (when safe)
+   This ensures changes are **rollback-safe**.
 
 ---
 
-### 5. Undo
-Click **Undo last** to revert the most recent apply:
-- Files are moved back to their original locations
-- Empty directories created during apply are removed
+### Typical workflow (safe by design)
+1) Select folder + load/generate rules → 2) **Scan** → 3) **Plan (Preview)** → 4) Review/filter → 5) **Apply** → 6) **Undo last** if needed
 
-This guarantees filesystem safety and reversibility.
